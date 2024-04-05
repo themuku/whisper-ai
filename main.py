@@ -6,6 +6,9 @@ from fpdf import FPDF
 
 
 def main():
+    if not path.exists('audios'):
+        makedirs('audios')  # Create a directory to store the audio files
+
     loop_through_files("audios")
     loop_through_files("mp3")
     loop_through_files("chunks")
@@ -30,6 +33,8 @@ def chunk_audio(file_path):
     audio = pydub.AudioSegment.from_mp3(file_path)
     file_name = path.basename(file_path).split(".")[0]
     print("Length of original audio is ", len(audio) / 1000, " seconds")
+    if not path.exists('chunks'):
+        makedirs('chunks')
     chunk_length = 10 * 60 * 1000
     chunks = [audio[i:i + chunk_length] for i in range(0, len(audio), chunk_length)]
     for i, chunk in enumerate(chunks):
@@ -40,6 +45,8 @@ def chunk_audio(file_path):
 def transcribe_audio(file_path):
     file_name = path.basename(file_path).split(".")[0].split("_")[0]
     print("Transcribing audio file {}".format(file_path))
+    if not path.exists('transcripts'):
+        makedirs('transcripts')
     model = whisper.load_model("tiny.en")
     result = model.transcribe(file_path)
     text = result["text"]
@@ -70,6 +77,8 @@ def txt_to_pdf(txt_file_path):
     pdf.add_page()
     file_path = path.basename(txt_file_path)
     pdf.set_font("Arial", size=10)
+    if not path.exists('pdf'):
+        makedirs('pdf')
     with open(txt_file_path, "r", encoding='utf-8') as f:
         for line in f:
             # Replace non-'latin-1' characters with a placeholder
